@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import CityWeatherCard from "../CityWeatherCard/CityWeatherCard";
 import ForecastWeatherCard from "../ForecastWeatherCard/ForecastWeatherCard";
 import TodayWeatherCard from "../TodayWeatherCard/TodayWeatherCard";
 import "./WeatherMainContainer.css";
-
+import { getWeather } from "../../api/backend";
 function WeatherMainContainer() {
   const apiData = {
     temp: 32,
@@ -32,27 +33,50 @@ function WeatherMainContainer() {
   ];
 
   const foreCastData = [
-    { min: 18, max: 19 },
     {
+      day: "Mon",
       min: 18,
       max: 19,
+      weather: "clear",
     },
     {
+      day: "Tue",
       min: 18,
-      max: 20,
+      max: 19,
+      weather: "rain",
     },
     {
+      day: "Wed",
       min: 18,
       max: 20,
+      weather: "cloud",
+    },
+    {
+      day: "Thu",
+      min: 18,
+      max: 20,
+      weather: "cloud",
     },
   ];
-
+  const [data, setData] = useState();
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await getWeather();
+      setData(result.data);
+    };
+    fetchData();
+  }, []);
+  if (!data) {
+    return <></>;
+  }
   return (
-    <div className="weather-main-container flex">
-      <TodayWeatherCard data={apiData} />
-      <div>
+    <div className="weather-main-container">
+      <TodayWeatherCard data={data[0]} />
+      <div className="flex">
         <CityWeatherCard cities={cityData} />
-        <ForecastWeatherCard foreCastData={foreCastData} />
+        <ForecastWeatherCard
+          foreCastData={data.filter((item) => item.dt_txt.includes("12:00:00"))}
+        />
       </div>
     </div>
   );
